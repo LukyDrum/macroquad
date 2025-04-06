@@ -413,7 +413,6 @@ impl<'a> Editbox<'a> {
         for (n, character) in text_vec
             .iter()
             .copied()
-            .chain(std::iter::once(' '))
             .enumerate()
         {
             let character = if character != '\n' && self.password {
