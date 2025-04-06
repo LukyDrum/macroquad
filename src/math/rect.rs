@@ -90,7 +90,7 @@ impl Rect {
     }
 
     /// Returns a new `Rect` that includes all points of these two `Rect`s.
-    pub const fn combine_with(self, other: Rect) -> Rect {
+    pub fn combine_with(self, other: Rect) -> Rect {
         let x = f32::min(self.x, other.x);
         let y = f32::min(self.y, other.y);
         let w = f32::max(self.right(), other.right()) - x;
@@ -99,7 +99,7 @@ impl Rect {
     }
 
     /// Returns an intersection rect if there is any intersection.
-    pub const fn intersect(&self, other: Rect) -> Option<Rect> {
+    pub fn intersect(&self, other: Rect) -> Option<Rect> {
         let left = self.x.max(other.x);
         let top = self.y.max(other.y);
         let right = self.right().min(other.right());
@@ -118,7 +118,7 @@ impl Rect {
     }
 
     /// Translate rect origin by `offset` vector.
-    pub const fn offset(self, offset: Vec2) -> Rect {
+    pub fn offset(self, offset: Vec2) -> Rect {
         Rect::new(self.x + offset.x, self.y + offset.y, self.w, self.h)
     }
 }

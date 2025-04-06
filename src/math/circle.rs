@@ -45,7 +45,7 @@ impl Circle {
     }
 
     /// Checks whether the `Circle` overlaps a `Rect`.
-    pub const fn overlaps_rect(&self, rect: &Rect) -> bool {
+    pub fn overlaps_rect(&self, rect: &Rect) -> bool {
         let dist_x = (self.x - rect.center().x).abs();
         let dist_y = (self.y - rect.center().y).abs();
         if dist_x > rect.w / 2.0 + self.r || dist_y > rect.h / 2.0 + self.r {
