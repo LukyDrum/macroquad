@@ -1,6 +1,8 @@
+use glam::Vec2;
+
 use crate::{
     math::{vec2, Rect},
-    ui::{widgets::Editbox, ElementState, Id, Layout, Ui},
+    ui::{widgets::Editbox, ElementState, Id, Ui},
 };
 
 use std::ops::Range;
@@ -9,6 +11,8 @@ pub struct Slider<'a> {
     id: Id,
     label: &'a str,
     range: Range<f32>,
+    position: Vec2,
+    size: Vec2,
 }
 
 impl<'a> Slider<'a> {
@@ -17,6 +21,8 @@ impl<'a> Slider<'a> {
             id,
             range,
             label: "",
+            position: vec2(10.0, 10.0),
+            size: vec2(300.0, 20.0),
         }
     }
 
@@ -25,17 +31,30 @@ impl<'a> Slider<'a> {
             id: self.id,
             range: self.range,
             label,
+            position: self.position,
+            size: self.size,
+        }
+    }
+
+    pub const fn position(self, position: Vec2) -> Slider<'a> {
+        Slider {
+            position,
+            ..self
+        }
+    }
+
+    pub const fn size(self, size: Vec2) -> Slider<'a> {
+        Slider {
+            size,
+            ..self
         }
     }
 
     pub fn ui(self, ui: &mut Ui, data: &mut f32) {
         let context = ui.get_active_window_context();
 
-        let size = vec2(
-            context.window.cursor.area.w - context.style.margin * 3. - context.window.cursor.ident,
-            19.,
-        );
-        let pos = context.window.cursor.fit(size, Layout::Vertical);
+        let size = self.size;
+        let pos = self.position;
 
         let editbox_width = 50.;
         let label_width = 100.;
