@@ -16,7 +16,7 @@ impl<'a, 'b, 'c> ComboBox<'a, 'b, 'c> {
             id,
             label: "",
             variants,
-            ratio: 0.5,
+            ratio: 1.0,
         }
     }
 

@@ -22,7 +22,7 @@ impl<'a> InputText<'a> {
             label: "",
             numbers: false,
             password: false,
-            ratio: 0.5,
+            ratio: 1.0,
             pos: None,
             margin: None,
         }

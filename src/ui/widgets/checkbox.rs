@@ -16,7 +16,7 @@ impl<'a> Checkbox<'a> {
         Checkbox {
             id,
             label: "",
-            ratio: 0.5,
+            ratio: 1.0,
             pos: None,
             size: None,
         }
