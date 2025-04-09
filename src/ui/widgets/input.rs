@@ -12,6 +12,8 @@ pub struct InputText<'a> {
     ratio: f32,
     pos: Option<Vec2>,
     margin: Option<Vec2>,
+    input_font_size: Option<f32>,
+    label_font_size: Option<f32>,
 }
 
 impl<'a> InputText<'a> {
@@ -25,20 +27,13 @@ impl<'a> InputText<'a> {
             ratio: 1.0,
             pos: None,
             margin: None,
+            input_font_size: None,
+            label_font_size: None,
         }
     }
 
     pub const fn label<'b>(self, label: &'b str) -> InputText<'b> {
-        InputText {
-            id: self.id,
-            size: self.size,
-            label,
-            numbers: self.numbers,
-            password: self.password,
-            ratio: self.ratio,
-            pos: self.pos,
-            margin: self.margin,
-        }
+        InputText { label, ..self }
     }
 
     pub const fn size(self, size: Vec2) -> Self {
@@ -77,6 +72,20 @@ impl<'a> InputText<'a> {
         }
     }
 
+    pub const fn input_font_size(self, font_size: f32) -> Self {
+        Self {
+            input_font_size: Some(font_size),
+            ..self
+        }
+    }
+
+    pub const fn label_font_size(self, font_size: f32) -> Self {
+        Self {
+            label_font_size: Some(font_size),
+            ..self
+        }
+    }
+
     pub fn ui(self, ui: &mut Ui, data: &mut String) {
         let context = ui.get_active_window_context();
 
@@ -103,6 +112,9 @@ impl<'a> InputText<'a> {
             .password(self.password)
             .position(pos)
             .multiline(false);
+        if let Some(font_size) = self.input_font_size {
+            editbox = editbox.font_size(font_size);
+        }
 
         if let Some(margin) = self.margin {
             editbox = editbox.margin(margin);
@@ -117,9 +129,16 @@ impl<'a> InputText<'a> {
 
         let context = ui.get_active_window_context();
 
+        let label_style = if let Some(font_size) = self.label_font_size {
+            let mut style = context.style.label_style.clone();
+            style.font_size = font_size as u16;
+            style
+        } else {
+            context.style.label_style.clone()
+        };
         if self.label.is_empty() == false {
             context.window.painter.draw_element_label(
-                &context.style.label_style,
+                &label_style,
                 Vec2::new(pos.x + size.x * self.ratio, pos.y),
                 self.label,
                 ElementState {

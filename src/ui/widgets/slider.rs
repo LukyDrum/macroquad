@@ -37,17 +37,11 @@ impl<'a> Slider<'a> {
     }
 
     pub const fn position(self, position: Vec2) -> Slider<'a> {
-        Slider {
-            position,
-            ..self
-        }
+        Slider { position, ..self }
     }
 
     pub const fn size(self, size: Vec2) -> Slider<'a> {
-        Slider {
-            size,
-            ..self
-        }
+        Slider { size, ..self }
     }
 
     pub fn ui(self, ui: &mut Ui, data: &mut f32) {

@@ -14,6 +14,7 @@ pub struct Editbox<'a> {
     pos: Option<Vec2>,
     password: bool,
     margin: Option<Vec2>,
+    font_size: Option<f32>,
 }
 
 mod text_editor;
@@ -33,6 +34,7 @@ impl<'a> Editbox<'a> {
             pos: None,
             password: false,
             margin: None,
+            font_size: None,
         }
     }
 
@@ -60,20 +62,21 @@ impl<'a> Editbox<'a> {
 
     pub fn filter<'b>(self, filter: &'b dyn Fn(char) -> bool) -> Editbox<'b> {
         Editbox {
-            id: self.id,
-            pos: self.pos,
-            multiline: self.multiline,
-            select_all: self.select_all,
-            size: self.size,
-            password: self.password,
             filter: Some(filter),
-            margin: self.margin,
+            ..self
         }
     }
 
     pub const fn margin(self, margin: Vec2) -> Self {
         Editbox {
             margin: Some(margin),
+            ..self
+        }
+    }
+
+    pub const fn font_size(self, font_size: f32) -> Self {
+        Editbox {
+            font_size: Some(font_size),
             ..self
         }
     }
@@ -386,7 +389,13 @@ impl<'a> Editbox<'a> {
             false,
         );
 
-        let line_height = context.style.editbox_style.font_size as f32;
+        let box_font_size = if let Some(font_size) = self.font_size {
+            font_size
+        } else {
+            context.style.editbox_style.font_size as f32
+        };
+
+        let line_height = box_font_size;
 
         let size = vec2(
             150.,
@@ -410,18 +419,14 @@ impl<'a> Editbox<'a> {
         let mut y = 0.;
         let mut clicked = false;
 
-        for (n, character) in text_vec
-            .iter()
-            .copied()
-            .enumerate()
-        {
+        for (n, character) in text_vec.iter().copied().enumerate() {
             let character = if character != '\n' && self.password {
                 '*'
             } else {
                 character
             };
 
-            let font_size = context.style.editbox_style.font_size;
+            let font_size = box_font_size;
             if n == state.cursor as usize && input_focused {
                 // caret
                 context.window.painter.draw_rect(
@@ -432,7 +437,7 @@ impl<'a> Editbox<'a> {
             }
 
             let mut font = context.style.editbox_style.font.lock().unwrap();
-            let font_size = context.style.editbox_style.font_size;
+            let font_size = box_font_size;
 
             let mut advance = 1.5; // 1.5 - hack to make cursor on newlines visible
 
@@ -443,11 +448,11 @@ impl<'a> Editbox<'a> {
                     Rect::new(
                         pos.x,
                         pos.y,
-                        context
-                            .window
-                            .painter
-                            .character_advance(character, &font, font_size)
-                            + 1.0,
+                        context.window.painter.character_advance(
+                            character,
+                            &font,
+                            font_size as u16,
+                        ) + 1.0,
                         font_size as f32 - 1.,
                     ),
                     None,
@@ -468,7 +473,7 @@ impl<'a> Editbox<'a> {
                         pos + vec2(x, y + font_size as f32 - baseline),
                         text_color,
                         &mut font,
-                        font_size,
+                        font_size as u16,
                     )
                     .unwrap_or(0.);
             }
