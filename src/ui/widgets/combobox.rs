@@ -8,6 +8,8 @@ pub struct ComboBox<'a, 'b, 'c> {
     label: &'a str,
     variants: &'b [&'c str],
     ratio: f32,
+    size: Option<Vec2>,
+    position: Option<Vec2>,
 }
 
 impl<'a, 'b, 'c> ComboBox<'a, 'b, 'c> {
@@ -17,34 +19,48 @@ impl<'a, 'b, 'c> ComboBox<'a, 'b, 'c> {
             label: "",
             variants,
             ratio: 1.0,
+            size: None,
+            position: None,
         }
     }
 
     pub const fn label<'x>(self, label: &'x str) -> ComboBox<'x, 'b, 'c> {
-        ComboBox {
-            id: self.id,
-            variants: self.variants,
-            label,
-            ratio: self.ratio,
-        }
+        ComboBox { label, ..self }
     }
 
     pub const fn ratio(self, ratio: f32) -> Self {
         Self { ratio, ..self }
     }
+
+    pub const fn size(self, size: Vec2) -> Self {
+        Self {
+            size: Some(size),
+            ..self
+        }
+    }
+
+    pub const fn position(self, position: Vec2) -> Self {
+        Self {
+            position: Some(position),
+            ..self
+        }
+    }
+
     pub fn ui(self, ui: &mut Ui, data: &mut usize) -> usize {
         let mut context = ui.get_active_window_context();
 
         let line_height = context.style.label_style.font_size;
 
-        let size = vec2(
+        let size = self.size.unwrap_or(vec2(
             context.window.cursor.area.w - context.style.margin * 2. - context.window.cursor.ident,
             (line_height as f32 + 4.).max(19.),
-        );
+        ));
 
         let combobox_area_w = size.x * self.ratio - 15.;
 
-        let pos = context.window.cursor.fit(size, Layout::Vertical);
+        let pos = self
+            .position
+            .unwrap_or(context.window.cursor.fit(size, Layout::Vertical));
 
         let active_area_w = size.x * self.ratio;
 
